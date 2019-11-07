@@ -1,6 +1,7 @@
 package cyrpt
 
 import (
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ func keyFunc(token *jwt.Token) (interface{}, error) { return jwtKey, nil }
 
 // data structure representing a parsed JWT string.
 type Claims struct {
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -51,7 +53,8 @@ func (cb *cookieBuilder) Build() string {
 
 	// Declare the token with the algorithm used for signing, and JWT claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims{
-		jwt.StandardClaims{
+		Email: cb.email,
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: cb.expiry.Unix(),
 		},
 	})
@@ -72,13 +75,16 @@ func (cb *cookieBuilder) Build() string {
 	}
 }
 
-func Validate(cookie string, claims *Claims) error {
+func Validate(cookie string) (*Claims, error) {
+	c := &Claims{}
 	// find the token in the cookie, may not exist.
 	token := regex.ReplaceAllString(cookie, `$2`)
-	if _, err := jwt.ParseWithClaims(token, claims, keyFunc); err != nil {
+	if tkn, err := jwt.ParseWithClaims(token, c, keyFunc); err != nil {
 		// either the token expired or the signature doesn't match.
-		return err
+		return c, err
+	} else if !tkn.Valid {
+		return c, errors.New("invalid token")
 	} else {
-		return nil
+		return c, nil
 	}
 }
