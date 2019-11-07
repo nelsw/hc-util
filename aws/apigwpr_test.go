@@ -10,7 +10,7 @@ import (
 
 var code = 200
 var head = map[string]string{"Access-Control-Allow-Origin": "*"}
-var body = string([]byte(`{"success":""}`))
+var text = string("bad command: test msg")
 var data = map[string]string{"success": ""}
 var toke = ""
 
@@ -29,7 +29,7 @@ func TestBuild(t *testing.T) {
 	}
 
 	// build actual test object
-	actual, err := New().Head(head).Code(code).Json(body).Toke(toke).Data(data).Build()
+	actual, err := New().Head(head).Code(code).Text(text).Toke(toke).Data(data).Build()
 	if err != nil {
 		t.Errorf("could not build test response. details: %v", err)
 	}

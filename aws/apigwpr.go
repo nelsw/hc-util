@@ -13,7 +13,7 @@ type Object interface{}
 type ResponseBuilder interface {
 	Head(Headers) ResponseBuilder
 	Code(int) ResponseBuilder
-	Json(string) ResponseBuilder
+	Text(string) ResponseBuilder
 	Toke(string) ResponseBuilder
 	Data(Object) ResponseBuilder
 	Build() (events.APIGatewayProxyResponse, error)
@@ -37,7 +37,7 @@ func (r *responseBuilder) Code(statusCode int) ResponseBuilder {
 	return r
 }
 
-func (r *responseBuilder) Json(body string) ResponseBuilder {
+func (r *responseBuilder) Text(body string) ResponseBuilder {
 	r.body = body
 	return r
 }
